@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>ARIGATO!</title>
+  <script src="js/jquery-2.1.3.min.js"></script>
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hind:wght@400&display=swap" rel="stylesheet">
+</head>
+
+<body>
+<div class="wrapper">
+  <h1>ARIGATO!</h1>
+  <h2>ありがとうの波動を出して運気を上げよう</h2>
+  <main>
+    <div class="input-area">
+      <input id="text" type="text" placeholder="ありがとうを入力">
+    </div>
+    <button id="videoPlay" onclick="readAloud()">ありがとうの<br>波動を出す</button>
+    <div class="list_btn_wrap">
+      <button id="list_btn"><img src="list_btn.png" alt="ありがとうリストを表示する"></button>
+    </div>
+  </main>
+
+<!-- 動画&音 -->
+  <div class="vid_contents">
+    <video id="video">
+      <source src="movie/Bollywood Crazy Dance _ from the movie Bajirao Mastani.mp4" type="video/mp4">
+    </video>
+    </div>
+    <video id="audio">
+      <source src="movie/nc78744.wav" type="audio/mp4">
+    </video>
+
+    <div class="keep">
+      <button id="save" class="btnripple">ありがとうを貯める</button>
+    </div>
+
+    <div class="arigato_list">
+        <ul id="list">
+          <!-- ここに追加データが挿入される -->
+        </ul>
+      <div class="btn_area">
+        <button id="list_btn_close" class="btnripple">ありがとうリストを閉じる</button>
+        <button id="clear" class="btnripple">全てのありがとうを手放す</button>
+      </div>
+  </div>
+</div>
+
+
+  
+  <!-- 以下にjsを書いていきます -->
+<script>
+
+$('#list_btn').on( "click", function(){
+    $('.arigato_list').fadeIn(1000);
+
+      var target = $('#list li').length;
+      if ( target === 0 ){
+        $('#list').after('<div class="count" style="display: block;"><span>ありがとう</span>はありません</div>');
+      }
+      else {
+        $('#list').after('<div class="count" style="display: none;"></div>');
+      }
+      var size = $('.count').length;
+      console.log(size);
+       if ( size > 0 ){
+        $('.count').eq(1).addClass('invisible-count'); 
+      } 
+})
+  $('#list_btn_close').on( "click", function(){
+    $('.arigato_list,.count').fadeOut(1000);
+})
+  
+function readAloud() {
+  // テキストを取得
+  const text = document.getElementById("text").value;
+  if ('speechSynthesis' in window) {
+    // 発言を設定
+    const uttr = new SpeechSynthesisUtterance()
+    uttr.text = text
+    // 発言を再生
+    window.speechSynthesis.speak(uttr)
+  } 
+}
+$('#videoPlay').click(function(){
+  const text = document.getElementById("text").value;
+  const arigato = "ありがとう"
+  //console.log(text);
+ if(text.indexOf(arigato) > -1) { 
+    setTimeout(function(){
+       const position = $('#videoPlay').offset().top;
+       const speed = 600;
+       $("html,body").animate({scrollTop:position},speed);
+       var v = document.getElementById('video');
+       v.play();
+      $('.vid_contents').fadeIn(1000);
+      $('.keep').fadeIn(1000);
+    },3000);
+
+    setTimeout(function(){
+      $('.vid_contents').fadeOut(1000);
+      }, 40000);
+
+   // });
+  } 
+});
+
+
+
+      //1.Save クリックイベント
+      $('#save').on("click", function () {
+        var a = document.getElementById('audio');
+     a.play();
+      const key = new Date();
+      const text_val = $('#text').val();
+
+      // ローカルストレージにセット（登録）します🤗
+      localStorage.setItem(key, text_val);
+
+        var yy = key.getFullYear();
+        // 月(月のデータは「０～１１」が格納されてるので１を足してます)
+        var mm = key.getMonth() + 1;
+        // 日付
+        var dd = key.getDate().toString().padStart(2, '0');
+        // 時間
+        var h = key.getHours().toString().padStart(2, '0');
+        // 分数
+        var m = key.getMinutes().toString().padStart(2, '0');
+        var ima = ( yy + "年" + mm + "月" + dd + "日" + " " + h + ":" + m );
+        //console.log( yy + "年" + mm + "月" + dd + "日" + " " + h + ":" + m );
+         //$('#day'+ key).html(yy + "年" + mm + "月" + dd + "日" + " " + h + ":" + m );
+      
+
+      // 埋め込み用のhtmlのタグと変数を紐づけるテクニック
+      // ES6で登場したテンプレートリテラルというテクニックを使っています🤗
+      const html = `
+        <li>
+          <p class="day">${ima}</p>
+          <p>${text_val}</p>
+        </li>
+      `;
+
+      // html=画面に表示します🤗
+      $('#list').append(html)
+
+      var size = $('#list li').length;
+      console.log(size);
+      if ( size === 0 ){
+          // 画面に表示する
+        $('#list').after('<div class="cont"><span>ありがとう</span>はありません</div>');
+      } 
+
+      // 入力をしやすくするために、空欄にする🤗
+      $('#text').val("");
+      $('.keep').fadeOut(500);
+      $('.arigato_list').fadeIn(1000);
+
+      // この下は消さない
+    });
+
+    //2.clear クリックイベント
+    $('#clear').on('click', function () {
+      //保存されているローカルストレージを全削除する🤗
+      localStorage.clear();
+
+      // 画面に表示されているliタグを削除=抹消
+      $('#list').empty();
+      //$('.btn_area').fadeOut(1000);
+
+      // この下消さない
+    });
+
+    //3.ページ読み込み：保存データ取得表示
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      const value = localStorage.getItem(key);
+      const jikan = new Date(key);
+
+        var yy = jikan.getFullYear();
+        // 月(月のデータは「０～１１」が格納されてるので１を足してます)
+        var mm = jikan.getMonth() + 1;
+        // 日付
+        var dd = jikan.getDate().toString().padStart(2, '0');
+        // 時間
+        var h = jikan.getHours().toString().padStart(2, '0');
+        // 分数
+        var m = jikan.getMinutes().toString().padStart(2, '0');
+        var ima = ( yy + "年" + mm + "月" + dd + "日" + " " + h + ":" + m );
+
+      // htmlのタグと変数の埋め込み
+      const html = `
+        <li>
+          <p class="day">${ima}</p>
+          <p>${value}</p>
+        </li>
+      `;
+
+      // 画面に表示する
+      $('#list').append(html);
+
+      var size = $('#list li').length;
+      console.log(size);
+      if ( size === 0 ){
+          // 画面に表示する
+        $('#list').after('<div class="cont"><span>ありがとう</span>はありません</div>');
+      } 
+
+    }
+    
+
+
+  </script>
+</body>
+
+</html>
